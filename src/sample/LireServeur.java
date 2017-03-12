@@ -18,6 +18,21 @@ public class LireServeur {
     private Vector<Boolean> Construisible = new Vector<>();
     private Vector<String> Liaison = new Vector<>();
 
+    public ArrayList<String> GetCoordonnee()
+    {
+        return Coordonnee;
+    }
+
+    public Vector<Boolean> GetConstruisible()
+    {
+        return Construisible;
+    }
+
+    public Vector<String> GetLiaison()
+    {
+        return Liaison;
+    }
+
     public void LireNoeuds_Arcs()
     {
         try
@@ -28,7 +43,6 @@ public class LireServeur {
             String line;
             String newline;
             int Compteur = 0;
-
 
             do
             {
@@ -61,15 +75,12 @@ public class LireServeur {
               }
 
             }while(line != null);
-
             soc_Carte.close();
-
         }
         catch(IOException ioe)
         {
             System.out.println(ioe);
         }
-
     }
 
 
