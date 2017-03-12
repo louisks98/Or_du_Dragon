@@ -1,24 +1,21 @@
 package sample;
-
 import javafx.application.Application;
-import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
-import java.awt.*;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 import javafx.scene.image.Image;
-
-import javax.swing.*;
+import javafx.scene.text.*;
 
 public class Main extends Application {
+
+    double PosXCercle;
+    double PosYCercle;
 
     public void Cree_Noeud(Pane g, ArrayList<String> coord, Vector<Boolean> construsible)
     {
@@ -35,9 +32,20 @@ public class Main extends Application {
                 c.setStroke(Color.BLACK);
                 c.setStrokeWidth(1);
             }
+//            c.addEventHandler(MouseEvent.MOUSE_CLICKED,  e -> {
+//                String texte = "X: " + c.getCenterX() + "   Y: " + c.getCenterY();
+//
+//            });
             g.getChildren().add(c);
+
         }
     }
+
+//    public void GererClick(MouseEvent e, Circle c)
+//    {
+//        PosXCercle = c.getCenterX();
+//        PosYCercle = c.getCenterY();
+//    }
 
     public void CreeLiens(Pane g, ArrayList<String> coord, Vector<String> Liaison)
     {
@@ -75,8 +83,8 @@ public class Main extends Application {
                     y2 = getCoordonneeY(coord.get(Integer.parseInt(node)));
                     terminer = true;
                 }
-                Line l = new Line(x1, y1, x2, y2);
-                g.getChildren().add(l);
+                Line ln = new Line(x1, y1, x2, y2);
+                g.getChildren().add(ln);
 
             }while(!terminer);
         }
@@ -111,11 +119,14 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception{
+
         LireServeur serveur = new LireServeur();
         Pane root = new Pane();
         serveur.LireNoeuds_Arcs();
         Cree_Noeud(root ,serveur.GetCoordonnee(), serveur.GetConstruisible());
         CreeLiens(root, serveur.GetCoordonnee(), serveur.GetLiaison());
+
+
 
         Image image = new Image("file:nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
@@ -125,6 +136,7 @@ public class Main extends Application {
         primaryStage.show();
 
     }
+
 
     public static void main(String[] args) {
         launch(args);
