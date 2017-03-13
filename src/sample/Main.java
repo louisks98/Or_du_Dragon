@@ -32,12 +32,7 @@ public class Main extends Application {
                 c.setStroke(Color.BLACK);
                 c.setStrokeWidth(1);
             }
-//            c.addEventHandler(MouseEvent.MOUSE_CLICKED,  e -> {
-//                String texte = "X: " + c.getCenterX() + "   Y: " + c.getCenterY();
-//
-//            });
             g.getChildren().add(c);
-
         }
     }
 
@@ -116,6 +111,14 @@ public class Main extends Application {
         return y;
     }
 
+    class ChangerCouleur implements Runnable
+    {
+        @Override
+        public void run()
+        {
+
+        }
+    }
 
     @Override
     public void start(Stage primaryStage) throws Exception{
@@ -123,18 +126,28 @@ public class Main extends Application {
         LireServeur serveur = new LireServeur();
         Pane root = new Pane();
         serveur.LireNoeuds_Arcs();
-        Cree_Noeud(root ,serveur.GetCoordonnee(), serveur.GetConstruisible());
         CreeLiens(root, serveur.GetCoordonnee(), serveur.GetLiaison());
+        Cree_Noeud(root ,serveur.GetCoordonnee(), serveur.GetConstruisible());
+        serveur.LirePosition();
 
-
-
+        Text texte = new Text(1500, 700, "");
+        root.getChildren().add(texte);
         Image image = new Image("file:nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
+        primaryStage.addEventHandler(MouseEvent.MOUSE_CLICKED e -> GererClick(e));
         primaryStage.show();
+    }
 
+    public void GererClick(MouseEvent e)
+    {
+        if(e.getSource() instanceof Circle)
+        {
+            Circle cr = (Circle)e.getSource();
+            texte.setText("X: " + cr.getCenterX() + "   Y: " + cr.getCenterY());
+        }
     }
 
 
