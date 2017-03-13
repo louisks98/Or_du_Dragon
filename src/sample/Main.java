@@ -6,16 +6,13 @@ import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
-import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Vector;
 import javafx.scene.image.Image;
 import javafx.scene.text.*;
+import javafx.scene.input.MouseEvent;
 
 public class Main extends Application {
-
-    double PosXCercle;
-    double PosYCercle;
 
     public void Cree_Noeud(Pane g, ArrayList<String> coord, Vector<Boolean> construsible)
     {
@@ -26,21 +23,17 @@ public class Main extends Application {
             x = getCoordonneeX(coord.get(i));
             y = getCoordonneeY(coord.get(i));
             Circle c = new Circle(x, y, 10);
-            if(construsible.get(i) == true) // Demander prof pour couleur
+            if(construsible.get(i) == true)
             {
                 c.setFill(Color.WHITE);
                 c.setStroke(Color.BLACK);
                 c.setStrokeWidth(1);
             }
+            c.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {texte.setText("X: " + c.getCenterX() + "   Y: " + c.getCenterY());});
+
             g.getChildren().add(c);
         }
     }
-
-//    public void GererClick(MouseEvent e, Circle c)
-//    {
-//        PosXCercle = c.getCenterX();
-//        PosYCercle = c.getCenterY();
-//    }
 
     public void CreeLiens(Pane g, ArrayList<String> coord, Vector<String> Liaison)
     {
@@ -120,6 +113,7 @@ public class Main extends Application {
         }
     }
 
+    Text texte = new Text(1400, 850, "X:  Y:");
     @Override
     public void start(Stage primaryStage) throws Exception{
 
@@ -130,26 +124,15 @@ public class Main extends Application {
         Cree_Noeud(root ,serveur.GetCoordonnee(), serveur.GetConstruisible());
         serveur.LirePosition();
 
-        Text texte = new Text(1500, 700, "");
+        texte.setFont(new Font(20));
         root.getChildren().add(texte);
         Image image = new Image("file:nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
-        primaryStage.addEventHandler(MouseEvent.MOUSE_CLICKED e -> GererClick(e));
         primaryStage.show();
     }
-
-    public void GererClick(MouseEvent e)
-    {
-        if(e.getSource() instanceof Circle)
-        {
-            Circle cr = (Circle)e.getSource();
-            texte.setText("X: " + cr.getCenterX() + "   Y: " + cr.getCenterY());
-        }
-    }
-
 
     public static void main(String[] args) {
         launch(args);
