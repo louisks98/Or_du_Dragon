@@ -44,6 +44,9 @@ public class LireServeur {
         return Liaison;
     }
 
+    public Vector<String[]> GetPosition() {return Position;}
+
+
     public void LireNoeuds_Arcs()
     {
         try
