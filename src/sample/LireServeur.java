@@ -27,7 +27,8 @@ public class LireServeur {
     private ArrayList<String> Coordonnee = new ArrayList<>();
     private Vector<Boolean> Construisible = new Vector<>();
     private Vector<String> Liaison = new Vector<>();
-    private Vector<String[]> Position = new Vector<>();
+    //private Vector<String[]> Position = new Vector<>();
+    private String Packet[];
 
     public ArrayList<String> GetCoordonnee()
     {
@@ -44,7 +45,7 @@ public class LireServeur {
         return Liaison;
     }
 
-    public Vector<String[]> GetPosition() {return Position;}
+    public String[] GetPosition() {return Packet;}
 
 
     public void LireNoeuds_Arcs()
@@ -112,27 +113,26 @@ public class LireServeur {
         }*/
         try
         {
-            //InetAddress addr;
             Socket socketPosition = new Socket(IP, PORT_POSITION);
-            //addr = socketPosition.getInetAddress();
             serveurReader = new BufferedReader(new InputStreamReader(socketPosition.getInputStream()));
             serveurWriter = new PrintWriter(new OutputStreamWriter(socketPosition.getOutputStream()));
             String ligne;
-            String Packet[];
-            /*Terminator leTerminator = new Terminator();
-            Thread t = new Thread(leTerminator);
-            t.start();*/
+
+
 
                 ligne = serveurReader.readLine();
                 serveurWriter.println("");
                 serveurWriter.flush();
-                //boolean estTrouver = false;
+//            do
+//            {
                 if (ligne != null)
                 {
                     Packet = ligne.split(" ");
-                    Position.add(Packet);
+                    //Position.add(Packet);
+                    //ligne = serveurReader.readLine();
                 }
-
+            //}while (ligne != null);
+            socketPosition.close();
         }
         catch (java.io.IOException e)
         {

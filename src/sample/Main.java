@@ -111,7 +111,7 @@ public class Main extends Application {
         final String joueur = "J";
         final String troll = "T";
         final String gobelin = "G";
-        final String montainDew = "M";
+        final String mountainDew = "M";
         final String doritos = "D";
         final String auberge = "A";
         final String manoir = "N";
@@ -120,17 +120,33 @@ public class Main extends Application {
         @Override
         public void run()
         {
-            String packet[];
+            String[] packet;
             String idCercle;
             String objet;
-            ls.LirePosition();
-            for(int i = 0; i < ls.GetPosition().size(); i++)
+            String[] info;
+            try
             {
-                packet = ls.GetPosition().get(i)[i].split(":");
-                idCercle = packet[1];
-                objet = packet[2];
-                ChangerCercle(idCercle, objet);
+                while(true)
+                {
+                    ls.LirePosition();
+
+                    info = ls.GetPosition();
+                    ResetColor();
+                    for(int i = 0; i < info.length; i++)
+                    {
+                        packet = info[i].split(":");
+                        idCercle = packet[0];
+                        objet = packet[1];
+                        ChangerCercle(idCercle, objet);
+                    }
+                    Thread.sleep(1000);
+                }
             }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+
         }
         public void ChangerCercle(String id, String obj)
         {
@@ -142,24 +158,43 @@ public class Main extends Application {
                 break;
                 case gobelin : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKSALMON);
                 break;
-                case  montainDew : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKSEAGREEN);
+                case  mountainDew : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKSEAGREEN);
                 break;
                 case doritos : tbCircle.get(Integer.parseInt(id)).setFill(Color.ORANGE);
                 break;
                 case auberge : tbCircle.get(Integer.parseInt(id)).setFill(Color.AQUA);
                 break;
+                case manoir : tbCircle.get(Integer.parseInt(id)).setFill(Color.BLANCHEDALMOND);
+                break;
+                case chateau : tbCircle.get(Integer.parseInt(id)).setFill(Color.CRIMSON);
+                break;
+            }
+        }
+    }
+    public void ResetColor()
+    {
+        for (int i = 0; i < tbCircle.size(); i++)
+        {
+            if(serveur.GetConstruisible().get(i))
+            {
+                tbCircle.get(i).setFill(Color.WHITE);
+            }
+            else
+            {
+                tbCircle.get(i).setFill(Color.BLACK);
             }
         }
 
     }
 
     Text texte = new Text(1400, 850, "X:  Y:");
+    LireServeur serveur = new LireServeur();
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         ChangerCouleur couleur = new ChangerCouleur();
         Thread t = new Thread(couleur);
-        LireServeur serveur = new LireServeur();
+
         Pane root = new Pane();
         serveur.LireNoeuds_Arcs();
         CreeLiens(root, serveur.GetCoordonnee(), serveur.GetLiaison());
@@ -172,8 +207,8 @@ public class Main extends Application {
         root.setBackground(new Background(bg));
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
-        t.start();
         primaryStage.show();
+        t.start();
     }
 
     public static void main(String[] args) {
