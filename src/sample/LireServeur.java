@@ -101,24 +101,14 @@ public class LireServeur {
     public void LirePosition()
     {
         BufferedReader serveurReader;
-        BufferedReader reader;
         PrintWriter serveurWriter;
 
-        /*if (args.length > 0)
-        {
-            for (int i = 0;i < args.length; i++)
-            {
-                VerifierParametre(args[i],joueur,troll,gobelin,montainDew,doritos,auberge,manoir,chateau);
-            }
-        }*/
         try
         {
             Socket socketPosition = new Socket(IP, PORT_POSITION);
             serveurReader = new BufferedReader(new InputStreamReader(socketPosition.getInputStream()));
             serveurWriter = new PrintWriter(new OutputStreamWriter(socketPosition.getOutputStream()));
             String ligne;
-
-
 
                 ligne = serveurReader.readLine();
                 serveurWriter.println("");
