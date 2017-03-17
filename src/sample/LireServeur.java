@@ -3,6 +3,7 @@ package sample;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Vector;
 
@@ -15,20 +16,13 @@ public class LireServeur {
     final private int  PORT_CARTE = 51005;
     final private int  PORT_POSITION = 51006;
 
-    final String joueur = "J";
-    final String troll = "T";
-    final String gobelin = "G";
-    final String montainDew = "M";
-    final String doritos = "D";
-    final String auberge = "A";
-    final String manoir = "N";
-    final String chateau = "C";
 
     private ArrayList<String> Coordonnee = new ArrayList<>();
     private Vector<Boolean> Construisible = new Vector<>();
     private Vector<String> Liaison = new Vector<>();
     //private Vector<String[]> Position = new Vector<>();
     private String Packet[];
+    Socket socketPosition;
 
     public ArrayList<String> GetCoordonnee()
     {
@@ -47,6 +41,22 @@ public class LireServeur {
 
     public String[] GetPosition() {return Packet;}
 
+    LireServeur()
+    {
+        try
+        {
+            socketPosition = new Socket(IP, PORT_POSITION);
+        }
+        catch (UnknownHostException e)
+        {
+            e.printStackTrace();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+
+    }
 
     public void LireNoeuds_Arcs()
     {
@@ -105,24 +115,23 @@ public class LireServeur {
 
         try
         {
-            Socket socketPosition = new Socket(IP, PORT_POSITION);
+
             serveurReader = new BufferedReader(new InputStreamReader(socketPosition.getInputStream()));
             serveurWriter = new PrintWriter(new OutputStreamWriter(socketPosition.getOutputStream()));
             String ligne;
 
+
                 ligne = serveurReader.readLine();
+                System.out.println(ligne);
                 serveurWriter.println("");
                 serveurWriter.flush();
-//            do
-//            {
+
                 if (ligne != null)
                 {
                     Packet = ligne.split(" ");
-                    //Position.add(Packet);
-                    //ligne = serveurReader.readLine();
+                    serveurWriter.println("");
+                    serveurWriter.flush();
                 }
-            //}while (ligne != null);
-            socketPosition.close();
         }
         catch (java.io.IOException e)
         {

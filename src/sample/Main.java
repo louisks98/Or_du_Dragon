@@ -116,7 +116,7 @@ public class Main extends Application {
         final String auberge = "A";
         final String manoir = "N";
         final String chateau = "C";
-        LireServeur ls = new LireServeur();
+
         @Override
         public void run()
         {
@@ -128,9 +128,9 @@ public class Main extends Application {
             {
                 while(true)
                 {
-                    ls.LirePosition();
+                    serveur.LirePosition();
 
-                    info = ls.GetPosition();
+                    info = serveur.GetPosition();
                     ResetColor();
                     for(int i = 0; i < info.length; i++)
                     {
@@ -139,7 +139,7 @@ public class Main extends Application {
                         objet = packet[1];
                         ChangerCercle(idCercle, objet);
                     }
-                    Thread.sleep(1000);
+                    Thread.sleep(1);
                 }
             }
             catch (InterruptedException e)
@@ -202,7 +202,7 @@ public class Main extends Application {
 
         texte.setFont(new Font(20));
         root.getChildren().add(texte);
-        Image image = new Image("file:nowhereland.png");
+        Image image = new Image("nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
         primaryStage.setTitle("L'Or du Dragon");
