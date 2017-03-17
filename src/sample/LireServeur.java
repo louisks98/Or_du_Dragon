@@ -24,6 +24,7 @@ public class LireServeur {
     //private Vector<String[]> Position = new Vector<>();
     private String Packet[];
     Socket socketPosition;
+    Socket socketJeu;
 
     public ArrayList<String> GetCoordonnee()
     {
@@ -47,6 +48,7 @@ public class LireServeur {
         try
         {
             socketPosition = new Socket(IP, PORT_POSITION);
+            //socketJeu = new Socket(IP, PORT_JEU);
         }
         catch (UnknownHostException e)
         {

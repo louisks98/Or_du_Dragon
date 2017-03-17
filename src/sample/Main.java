@@ -16,7 +16,7 @@ public class Main extends Application {
 
     public class Noeud extends Circle
     {
-        int num;
+        private int num;
 
         Noeud(int x, int y, int grosseur ,boolean constructible, int num)
         {
@@ -31,7 +31,12 @@ public class Main extends Application {
             {
                 this.setStroke(Color.BLACK);
             }
-            this.setStrokeWidth(2);
+            this.setStrokeWidth(3);
+        }
+
+        public int getNum()
+        {
+            return num;
         }
     }
 
@@ -45,16 +50,17 @@ public class Main extends Application {
         {
             x = getCoordonneeX(coord.get(i));
             y = getCoordonneeY(coord.get(i));
-            Circle c = new Circle(x, y, 10);
-            if(construsible.get(i) == true)
-            {
-                c.setFill(Color.WHITE);
-                c.setStroke(Color.BLACK);
-                c.setStrokeWidth(1);
-            }
-            c.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {texte.setText("X: " + c.getCenterX() + "   Y: " + c.getCenterY());});
-            tbCircle.add(c);
-            g.getChildren().add(c);
+            Noeud node = new Noeud(x, y, 12, construsible.get(i), i);
+//            Circle c = new Circle(x, y, 10);
+//            if(construsible.get(i) == true)
+//            {
+//                c.setFill(Color.WHITE);
+//                c.setStroke(Color.BLACK);
+//                c.setStrokeWidth(1);
+//            }
+            node.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());});
+            tbCircle.add(node);
+            g.getChildren().add(node);
         }
     }
 
@@ -95,6 +101,7 @@ public class Main extends Application {
                     terminer = true;
                 }
                 Line ln = new Line(x1, y1, x2, y2);
+                ln.setStrokeWidth(3);
                 g.getChildren().add(ln);
 
             }while(!terminer);
