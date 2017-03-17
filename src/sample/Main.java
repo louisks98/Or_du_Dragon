@@ -14,6 +14,27 @@ import javafx.scene.input.MouseEvent;
 
 public class Main extends Application {
 
+    public class Noeud extends Circle
+    {
+        int num;
+
+        Noeud(int x, int y, int grosseur ,boolean constructible, int num)
+        {
+            super(x, y, grosseur);
+            this.num = num;
+            if (constructible)
+            {
+                this.setFill(Color.WHITE);
+                this.setStroke(Color.BLACK);
+            }
+            else
+            {
+                this.setStroke(Color.BLACK);
+            }
+            this.setStrokeWidth(2);
+        }
+    }
+
     public Vector<Circle> tbCircle = new Vector<>();
 
     public void Cree_Noeud(Pane g, ArrayList<String> coord, Vector<Boolean> construsible)

@@ -14,7 +14,8 @@ public class LireServeur {
 
     final private String IP = "149.56.47.97";
     final private int  PORT_CARTE = 51005;
-    final private int  PORT_POSITION = 51006;
+    final private int  PORT_POSITION = 51008;
+    final private int PORT_JEU = 51007;
 
 
     private ArrayList<String> Coordonnee = new ArrayList<>();
@@ -138,6 +139,10 @@ public class LireServeur {
             System.out.println("Impossible de se connecter au serveur");
         }
     }
+
+
+
+
 
     public static void VerifierParametre(String param, String j, String t, String g, String m, String d, String a, String n, String c) {
         if (!param.equals(j) &&
