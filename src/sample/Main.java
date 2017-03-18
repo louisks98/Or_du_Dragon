@@ -1,9 +1,12 @@
 package sample;
 import javafx.application.Application;
+import javafx.event.EventHandler;
+import javafx.event.EventType;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.scene.paint.Color;
 import java.util.ArrayList;
@@ -11,12 +14,22 @@ import java.util.Vector;
 import javafx.scene.image.Image;
 import javafx.scene.text.*;
 import javafx.scene.input.MouseEvent;
+import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 
     public class Noeud extends Circle
     {
         private int num;
+        private boolean joueur;
+        private boolean troll;
+        private boolean gobelin;
+        private boolean mountainDew;
+        private boolean doritos;
+        private boolean auberge;
+        private boolean manoir;
+        private boolean chateau;
+        private boolean piece;
 
         Noeud(int x, int y, int grosseur ,boolean constructible, int num)
         {
@@ -38,7 +51,31 @@ public class Main extends Application {
         {
             return num;
         }
+
+        public void ShowItem(Pane g)
+        {
+            //todo
+        }
     }
+
+    public class Bouton extends Rectangle
+    {
+        private int num;
+        public Bouton(int x1 ,int x2, int y1, int y2, int num)
+        {
+            super(x1, y1, x2, y2);
+            this.num = num;
+            this.setStroke(Color.BLACK);
+            this.setFill(Color.WHITE);
+            this.setStrokeWidth(2);
+        }
+
+        public int getNum()
+        {
+            return num;
+        }
+    }
+
 
     public Vector<Circle> tbCircle = new Vector<>();
 
@@ -58,7 +95,10 @@ public class Main extends Application {
 //                c.setStroke(Color.BLACK);
 //                c.setStrokeWidth(1);
 //            }
-            node.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());});
+            node.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+                texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());
+                Protocole.CommandeGOTO(node.getNum());
+            });
             tbCircle.add(node);
             g.getChildren().add(node);
         }
@@ -144,6 +184,7 @@ public class Main extends Application {
         final String auberge = "A";
         final String manoir = "N";
         final String chateau = "C";
+        final String piece = "P";
 
         @Override
         public void run()
@@ -180,7 +221,7 @@ public class Main extends Application {
         {
             switch (obj)
             {
-                case joueur : tbCircle.get(Integer.parseInt(id)).setFill(Color.AQUA);
+                case joueur : tbCircle.get(Integer.parseInt(id)).setFill(Color.RED);
                 break;
                 case troll : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKGREEN);
                 break;
@@ -196,6 +237,7 @@ public class Main extends Application {
                 break;
                 case chateau : tbCircle.get(Integer.parseInt(id)).setFill(Color.CRIMSON);
                 break;
+                case piece : tbCircle.get(Integer.parseInt(id)).setFill(Color.GOLD);
             }
         }
     }
@@ -217,11 +259,17 @@ public class Main extends Application {
 
     Text texte = new Text(1400, 850, "X:  Y:");
     LireServeur serveur = new LireServeur();
+    PDF Protocole = new PDF();
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         ChangerCouleur couleur = new ChangerCouleur();
         Thread t = new Thread(couleur);
+
+        Bouton btnConnexion = new Bouton(50, 110, 50, 70, 1);
+
+        btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {Protocole.CommandeHELLO();});
+        Text texteBtn = new Text(60 , 90, "Connexion");
 
         Pane root = new Pane();
         serveur.LireNoeuds_Arcs();
@@ -233,10 +281,21 @@ public class Main extends Application {
         Image image = new Image("nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
+        root.getChildren().addAll(btnConnexion, texteBtn);
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
         primaryStage.show();
+        t.setDaemon(true);
         t.start();
+        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
+            @Override
+            public void handle(WindowEvent event) {
+                Protocole.CommandeQUIT();
+                serveur.CloseServeur();
+                Protocole.CloseServeur();
+                System.out.println("Serveur(s) déconnecté(s)");
+            }
+        });
     }
 
     public static void main(String[] args) {

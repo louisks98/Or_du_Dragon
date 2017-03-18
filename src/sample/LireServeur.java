@@ -14,8 +14,8 @@ public class LireServeur {
 
     final private String IP = "149.56.47.97";
     final private int  PORT_CARTE = 51005;
-    final private int  PORT_POSITION = 51008;
-    final private int PORT_JEU = 51007;
+    final private int  PORT_POSITION = 51006;
+
 
 
     private ArrayList<String> Coordonnee = new ArrayList<>();
@@ -23,8 +23,8 @@ public class LireServeur {
     private Vector<String> Liaison = new Vector<>();
     //private Vector<String[]> Position = new Vector<>();
     private String Packet[];
-    Socket socketPosition;
-    Socket socketJeu;
+    private Socket socketPosition;
+
 
     public ArrayList<String> GetCoordonnee()
     {
@@ -142,7 +142,18 @@ public class LireServeur {
         }
     }
 
-
+    public void CloseServeur()
+    {
+        try
+        {
+            socketPosition.close();
+            //socketJeu.close();
+        }
+        catch (IOException e)
+        {
+            e.printStackTrace();
+        }
+    }
 
 
 
