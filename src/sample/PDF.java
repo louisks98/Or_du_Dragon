@@ -16,6 +16,7 @@ public class PDF {
     private String passWord = "123QWEasdzxc";
     private BufferedReader reader;
     private PrintWriter writer;
+    private FonctionSQL Fsql = new FonctionSQL();
 
 
     PDF()
@@ -40,6 +41,11 @@ public class PDF {
         {
             writer.println("HELLO " + userName + " " + passWord);
             line = reader.readLine();
+            if(line.contains("OK"))
+            {
+                Fsql.Open();
+                Fsql.Init_BD();
+            }
             System.out.println(line);
         }
         catch (IOException e)
@@ -49,19 +55,30 @@ public class PDF {
 
     }
 
-    public void CommandeGOTO(int id)
+    public void CommandeGOTO(Main.Noeud node)
     {
         String line;
         try
         {
-            writer.println("GOTO " + id);
+            writer.println("GOTO " + node.getNum());
             line = reader.readLine();
+
+                if(line.equals("D"))
+                {
+                    Fsql.IncrementerDoritos();
+                }
+                if(line.equals("M"))
+                {
+                    Fsql.IncrementMountainDew();
+                }
+
             System.out.println(line);
         }
         catch (IOException e)
         {
             e.printStackTrace();
         }
+        //return line;
     }
 
     public void CommandeBUILD()
@@ -76,8 +93,8 @@ public class PDF {
         catch (IOException e)
         {
             e.printStackTrace();
-        }    }
-
+        }
+    }
     public void CommandeQUIT()
     {
         String line;
@@ -85,6 +102,7 @@ public class PDF {
         {
             writer.println("QUIT");
             line = reader.readLine();
+            if(line.contains("OK")) {Fsql.Close();}
             System.out.println(line);
         }
         catch (IOException e)

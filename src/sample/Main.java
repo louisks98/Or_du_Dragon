@@ -18,18 +18,20 @@ import javafx.stage.WindowEvent;
 
 public class Main extends Application {
 
+    final String joueur = "J";
+    final String troll = "T";
+    final String gobelin = "G";
+    final String mountainDew = "M";
+    final String doritos = "D";
+    final String auberge = "A";
+    final String manoir = "N";
+    final String chateau = "C";
+    final String piece = "P";
+
     public class Noeud extends Circle
     {
         private int num;
-        private boolean joueur;
-        private boolean troll;
-        private boolean gobelin;
-        private boolean mountainDew;
-        private boolean doritos;
-        private boolean auberge;
-        private boolean manoir;
-        private boolean chateau;
-        private boolean piece;
+        private boolean construisible;
 
         Noeud(int x, int y, int grosseur ,boolean constructible, int num)
         {
@@ -39,10 +41,12 @@ public class Main extends Application {
             {
                 this.setFill(Color.WHITE);
                 this.setStroke(Color.BLACK);
+                this.construisible = true;
             }
             else
             {
                 this.setStroke(Color.BLACK);
+                this.construisible = false;
             }
             this.setStrokeWidth(3);
         }
@@ -56,12 +60,37 @@ public class Main extends Application {
         {
             //todo
         }
+
+        public void ChangerCercle(String obj)
+        {
+            switch (obj)
+            {
+                case joueur : this.setFill(Color.RED);
+                break;
+                case troll : this.setFill(Color.DARKGREEN);
+                break;
+                case gobelin : this.setFill(Color.DARKSALMON);
+                break;
+                case  mountainDew : this.setFill(Color.DARKSEAGREEN);
+                break;
+                case doritos : this.setFill(Color.ORANGE);
+                break;
+                case auberge : this.setFill(Color.AQUA);
+                break;
+                case manoir : this.setFill(Color.BLANCHEDALMOND);
+                break;
+                case chateau : this.setFill(Color.CRIMSON);
+                break;
+                case piece : this.setFill(Color.GOLD);
+                break;
+            }
+        }
     }
 
     public class Bouton extends Rectangle
     {
         private int num;
-        public Bouton(int x1 ,int x2, int y1, int y2, int num)
+        public Bouton(int x1 ,int y1, int x2, int y2, int num)
         {
             super(x1, y1, x2, y2);
             this.num = num;
@@ -77,7 +106,7 @@ public class Main extends Application {
     }
 
 
-    public Vector<Circle> tbCircle = new Vector<>();
+    public Vector<Noeud> tbCircle = new Vector<>();
 
     public void Cree_Noeud(Pane g, ArrayList<String> coord, Vector<Boolean> construsible)
     {
@@ -88,16 +117,10 @@ public class Main extends Application {
             x = getCoordonneeX(coord.get(i));
             y = getCoordonneeY(coord.get(i));
             Noeud node = new Noeud(x, y, 12, construsible.get(i), i);
-//            Circle c = new Circle(x, y, 10);
-//            if(construsible.get(i) == true)
-//            {
-//                c.setFill(Color.WHITE);
-//                c.setStroke(Color.BLACK);
-//                c.setStrokeWidth(1);
-//            }
             node.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+                String line;
                 texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());
-                Protocole.CommandeGOTO(node.getNum());
+                Protocole.CommandeGOTO(node);
             });
             tbCircle.add(node);
             g.getChildren().add(node);
@@ -176,16 +199,6 @@ public class Main extends Application {
 
     class ChangerCouleur implements Runnable
     {
-        final String joueur = "J";
-        final String troll = "T";
-        final String gobelin = "G";
-        final String mountainDew = "M";
-        final String doritos = "D";
-        final String auberge = "A";
-        final String manoir = "N";
-        final String chateau = "C";
-        final String piece = "P";
-
         @Override
         public void run()
         {
@@ -206,7 +219,7 @@ public class Main extends Application {
                         packet = info[i].split(":");
                         idCercle = packet[0];
                         objet = packet[1];
-                        ChangerCercle(idCercle, objet);
+                        tbCircle.get(Integer.parseInt(idCercle)).ChangerCercle(objet);
                     }
                     Thread.sleep(1);
                 }
@@ -216,29 +229,6 @@ public class Main extends Application {
                 e.printStackTrace();
             }
 
-        }
-        public void ChangerCercle(String id, String obj)
-        {
-            switch (obj)
-            {
-                case joueur : tbCircle.get(Integer.parseInt(id)).setFill(Color.RED);
-                break;
-                case troll : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKGREEN);
-                break;
-                case gobelin : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKSALMON);
-                break;
-                case  mountainDew : tbCircle.get(Integer.parseInt(id)).setFill(Color.DARKSEAGREEN);
-                break;
-                case doritos : tbCircle.get(Integer.parseInt(id)).setFill(Color.ORANGE);
-                break;
-                case auberge : tbCircle.get(Integer.parseInt(id)).setFill(Color.AQUA);
-                break;
-                case manoir : tbCircle.get(Integer.parseInt(id)).setFill(Color.BLANCHEDALMOND);
-                break;
-                case chateau : tbCircle.get(Integer.parseInt(id)).setFill(Color.CRIMSON);
-                break;
-                case piece : tbCircle.get(Integer.parseInt(id)).setFill(Color.GOLD);
-            }
         }
     }
     public void ResetColor()
@@ -260,16 +250,28 @@ public class Main extends Application {
     Text texte = new Text(1400, 850, "X:  Y:");
     LireServeur serveur = new LireServeur();
     PDF Protocole = new PDF();
+    //FonctionSQL Fsql = new FonctionSQL();
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         ChangerCouleur couleur = new ChangerCouleur();
         Thread t = new Thread(couleur);
 
-        Bouton btnConnexion = new Bouton(50, 110, 50, 70, 1);
+        Bouton btnConnexion = new Bouton(10, 10, 100, 50, 1);
+        Bouton btnQuit = new Bouton(120, 10, 100, 50, 2);
 
-        btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {Protocole.CommandeHELLO();});
-        Text texteBtn = new Text(60 , 90, "Connexion");
+        btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            Protocole.CommandeHELLO();
+            //Fsql.Open();
+            //Fsql.Init_BD();
+        });
+        btnQuit.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
+            Protocole.CommandeQUIT();
+            //Fsql.Close();
+        });
+
+        Text texteBtn = new Text(20 , 40, "Connexion");
+        Text texteBtnQuit = new Text(140, 40, "Quitter");
 
         Pane root = new Pane();
         serveur.LireNoeuds_Arcs();
@@ -281,7 +283,7 @@ public class Main extends Application {
         Image image = new Image("nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
-        root.getChildren().addAll(btnConnexion, texteBtn);
+        root.getChildren().addAll(btnConnexion, texteBtn, btnQuit, texteBtnQuit);
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
         primaryStage.show();
@@ -290,7 +292,7 @@ public class Main extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                Protocole.CommandeQUIT();
+                //Protocole.CommandeQUIT();
                 serveur.CloseServeur();
                 Protocole.CloseServeur();
                 System.out.println("Serveur(s) déconnecté(s)");
