@@ -472,6 +472,9 @@ public class FonctionSQL
         }
         System.out.println();
 
+        System.out.println("Obtenir le code de la questions.");
+        System.out.println(q.getQuestionToServeur());
+
         FSQL_Test.Close();
     }
 }

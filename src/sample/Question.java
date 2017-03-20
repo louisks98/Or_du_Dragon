@@ -10,6 +10,12 @@ public class Question
     private static String enonce;
     private static String reponces[];
     private static boolean estBonne[] = {false,false,false,false};
+    private static int numBonneReponce;
+
+    public static int getNumBonneReponce()
+    {
+        return numBonneReponce;
+    }
 
     public static String getCodeQuestion()
     {
@@ -22,6 +28,7 @@ public class Question
         enonce = enonceQuestion;
         reponces = reponcesQuestion;
         estBonne[bonneReponce] = true;
+        numBonneReponce = bonneReponce;
     }
 
     public static String getEnonce()
@@ -53,5 +60,15 @@ public class Question
             System.err.println("Lindex d'une question est 0,1,2,3");
             return false;
         }
+    }
+
+    public static String getQuestionToServeur()
+    {
+        return (String)(":" + getEnonce() + ":" +
+                getReponces(0) + ":" +
+                getReponces(1) + ":" +
+                getReponces(2) + ":" +
+                getReponces(3) + ":" +
+                getNumBonneReponce());
     }
 }

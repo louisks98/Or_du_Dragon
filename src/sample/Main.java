@@ -2,6 +2,7 @@ package sample;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.event.EventType;
+import javafx.scene.PointLight;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
@@ -121,6 +122,9 @@ public class Main extends Application {
                 String line;
                 texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());
                 Protocole.CommandeGOTO(node);
+                texteCapital.setText(Protocole.getFond() + " Pieces");
+                texteDoritos.setText(Protocole.getDoritos() + " Doritos");
+                textemountainDew.setText(Protocole.getMountainDew() + " MountainDew");
             });
             tbCircle.add(node);
             g.getChildren().add(node);
@@ -248,17 +252,22 @@ public class Main extends Application {
     }
 
     Text texte = new Text(1400, 850, "X:  Y:");
-    LireServeur serveur = new LireServeur();
     PDF Protocole = new PDF();
+    Text texteCapital = new Text(250,40,"0 Pieces");
+    Text texteDoritos = new Text(250, 60, "0 Doritos");
+    Text textemountainDew = new Text(250, 80, "0 MountainDew");
+    LireServeur serveur = new LireServeur();
     //FonctionSQL Fsql = new FonctionSQL();
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         ChangerCouleur couleur = new ChangerCouleur();
         Thread t = new Thread(couleur);
+        Thread tQuestion = new Thread(Protocole);
 
         Bouton btnConnexion = new Bouton(10, 10, 100, 50, 1);
         Bouton btnQuit = new Bouton(120, 10, 100, 50, 2);
+        Bouton btnBuild = new Bouton(10, 70, 100, 50, 3);
 
         btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             Protocole.CommandeHELLO();
@@ -269,9 +278,11 @@ public class Main extends Application {
             Protocole.CommandeQUIT();
             //Fsql.Close();
         });
+        btnBuild.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {Protocole.CommandeBUILD();});
 
         Text texteBtn = new Text(20 , 40, "Connexion");
         Text texteBtnQuit = new Text(140, 40, "Quitter");
+        Text texteBtnBuild = new Text(20, 100,"Construire");
 
         Pane root = new Pane();
         serveur.LireNoeuds_Arcs();
@@ -279,16 +290,22 @@ public class Main extends Application {
         Cree_Noeud(root ,serveur.GetCoordonnee(), serveur.GetConstruisible());
 
         texte.setFont(new Font(20));
+        texteCapital.setFont(new Font(20));
+        texteDoritos.setFont(new Font(20));
+        textemountainDew.setFont(new Font(20));
+
         root.getChildren().add(texte);
         Image image = new Image("nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
-        root.getChildren().addAll(btnConnexion, texteBtn, btnQuit, texteBtnQuit);
+        root.getChildren().addAll(btnConnexion, texteBtn, btnQuit, texteBtnQuit, btnBuild, texteBtnBuild, texteCapital, texteDoritos, textemountainDew);
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
         primaryStage.show();
         t.setDaemon(true);
         t.start();
+        tQuestion.setDaemon(true);
+        tQuestion.start();
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
