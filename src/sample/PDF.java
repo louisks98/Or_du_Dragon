@@ -1,10 +1,14 @@
 package sample;
 
+import javafx.scene.control.ChoiceDialog;
 import javafx.scene.paint.Color;
 
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by LouisChristophe on 2017-03-18.
@@ -25,7 +29,36 @@ public class PDF implements  Runnable{
     private BufferedReader reader;
     private PrintWriter writer;
     private FonctionSQL Fsql = new FonctionSQL();
+    private String[] questionSeparer;
+    private int rep;
 
+
+
+    public class AfficherQuestion implements Runnable
+    {
+        @Override
+        public void run()
+        {
+            System.out.println("thread afficherquestion is running");
+            List<String> choix = new ArrayList<>();
+            choix.add(questionSeparer[2]);
+            choix.add(questionSeparer[3]);
+            choix.add(questionSeparer[4]);
+            choix.add(questionSeparer[5]);
+
+            ChoiceDialog<String> dialog = new ChoiceDialog<>(questionSeparer[2], choix);
+            dialog.setTitle("Question");
+            dialog.setHeaderText("Énigme posé par" + questionSeparer[0]);
+            dialog.setContentText(questionSeparer[1]);
+            Optional<String> result = dialog.showAndWait();
+            rep = -1;
+            if(result.isPresent())
+            {
+                rep = choix.indexOf(result.get());
+            }
+
+        }
+    }
 
     PDF()
     {
@@ -46,11 +79,14 @@ public class PDF implements  Runnable{
     {
         try
         {
+            System.out.println("thread pdf is running");
             String line;
             socketQuestion = new Socket(IP, PORT_ENIGME);
            BufferedReader readerQuestion = new BufferedReader(new InputStreamReader(socketQuestion.getInputStream()));
            PrintWriter writerQuestion = new PrintWriter(new OutputStreamWriter(socketQuestion.getOutputStream()), true);
            Question quest;
+           AfficherQuestion dialog = new AfficherQuestion();
+           Thread tAfficher = new Thread(dialog);
 
             writerQuestion.println("HELLO " + userName + " " + passWord);
             line = readerQuestion.readLine();
@@ -61,18 +97,29 @@ public class PDF implements  Runnable{
                     if(line.equals("AUB"))
                     {
                         quest =  Fsql.GetQuestionSelonImmeuble("F");
+                        System.out.println(quest.getQuestionToServeur());
                         writerQuestion.println(quest.getQuestionToServeur());
                     }
                     if(line.equals("MAN"))
                     {
                         quest =  Fsql.GetQuestionSelonImmeuble("M");
+                        System.out.println(quest.getQuestionToServeur());
                         writerQuestion.println(quest.getQuestionToServeur());
                     }
                     if(line.equals("CHA"))
                     {
                         quest =  Fsql.GetQuestionSelonImmeuble("D");
+                        System.out.println(quest.getQuestionToServeur());
                         writerQuestion.println(quest.getQuestionToServeur());
                     }
+                    if(line.contains(":"))
+                    {
+                        String question = line;
+                        System.out.println(line);
+                        questionSeparer = line.split(":");
+                        tAfficher.start();
+                    }
+                    System.out.println(line);
                 }
                 line = readerQuestion.readLine();
             }

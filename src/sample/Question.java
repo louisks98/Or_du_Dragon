@@ -64,7 +64,7 @@ public class Question
 
     public static String getQuestionToServeur()
     {
-        return (String)(":" + getEnonce() + ":" +
+        return (String)(getEnonce() + ":" +
                 getReponces(0) + ":" +
                 getReponces(1) + ":" +
                 getReponces(2) + ":" +

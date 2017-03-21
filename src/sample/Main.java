@@ -71,15 +71,15 @@ public class Main extends Application {
                 break;
                 case troll : this.setFill(Color.DARKGREEN);
                 break;
-                case gobelin : this.setFill(Color.DARKSALMON);
+                case gobelin : this.setFill(Color.DARKSEAGREEN);
                 break;
-                case  mountainDew : this.setFill(Color.DARKSEAGREEN);
+                case  mountainDew : this.setFill(Color.YELLOWGREEN);
                 break;
-                case doritos : this.setFill(Color.ORANGE);
+                case doritos : this.setFill(Color.DARKORANGE);
                 break;
                 case auberge : this.setFill(Color.AQUA);
                 break;
-                case manoir : this.setFill(Color.BLANCHEDALMOND);
+                case manoir : this.setFill(Color.PURPLE);
                 break;
                 case chateau : this.setFill(Color.CRIMSON);
                 break;
@@ -273,6 +273,8 @@ public class Main extends Application {
         btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             int num = Integer.parseInt(Protocole.CommandeHELLO());
             tbCircle.get(num).setFill(Color.BLUE);
+            tQuestion.setDaemon(true);
+            tQuestion.start();
             //tbCircle.get(num).estJoueur = true;
             //Fsql.Open();
             //Fsql.Init_BD();
@@ -307,8 +309,6 @@ public class Main extends Application {
         primaryStage.show();
         t.setDaemon(true);
         t.start();
-        tQuestion.setDaemon(true);
-        tQuestion.start();
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
