@@ -32,6 +32,7 @@ public class Main extends Application {
     public class Noeud extends Circle
     {
         private int num;
+        public boolean estJoueur = false;
         private boolean construisible;
 
         Noeud(int x, int y, int grosseur ,boolean constructible, int num)
@@ -66,7 +67,7 @@ public class Main extends Application {
         {
             switch (obj)
             {
-                case joueur : this.setFill(Color.RED);
+                case joueur : if(!estJoueur) {this.setFill(Color.RED);} else {this.setFill(Color.BLUE);}
                 break;
                 case troll : this.setFill(Color.DARKGREEN);
                 break;
@@ -270,7 +271,9 @@ public class Main extends Application {
         Bouton btnBuild = new Bouton(10, 70, 100, 50, 3);
 
         btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            Protocole.CommandeHELLO();
+            int num = Integer.parseInt(Protocole.CommandeHELLO());
+            tbCircle.get(num).setFill(Color.BLUE);
+            //tbCircle.get(num).estJoueur = true;
             //Fsql.Open();
             //Fsql.Init_BD();
         });

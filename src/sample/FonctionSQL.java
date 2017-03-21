@@ -92,8 +92,11 @@ public class FonctionSQL
     {
         try
         {
-            conn.close();
-            System.out.println("Connexion fermee !");
+            if(!conn.isClosed())
+            {
+                conn.close();
+                System.out.println("Connexion fermee !");
+            }
         }
         catch (SQLException Se)
         {

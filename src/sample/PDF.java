@@ -1,5 +1,7 @@
 package sample;
 
+import javafx.scene.paint.Color;
+
 import java.io.*;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -14,8 +16,9 @@ public class PDF implements  Runnable{
     final private int PORT_JEU = 51007;
     final private int PORT_ENIGME = 51008;
     private Socket socketJeu;
-    Socket socketQuestion;
-    boolean connecter = false;
+    private Socket socketQuestion;
+    private boolean connecter = false;
+    private Main.Noeud oldNode;
 
     private String userName = "LesRingos";
     private String passWord = "123QWEasdzxc";
@@ -51,22 +54,28 @@ public class PDF implements  Runnable{
 
             writerQuestion.println("HELLO " + userName + " " + passWord);
             line = readerQuestion.readLine();
-            if(line.equals("AUB"))
+            while(true)
             {
-               quest =  Fsql.GetQuestionSelonImmeuble("F");
-               writerQuestion.println(quest.getQuestionToServeur());
+                if (line != null)
+                {
+                    if(line.equals("AUB"))
+                    {
+                        quest =  Fsql.GetQuestionSelonImmeuble("F");
+                        writerQuestion.println(quest.getQuestionToServeur());
+                    }
+                    if(line.equals("MAN"))
+                    {
+                        quest =  Fsql.GetQuestionSelonImmeuble("M");
+                        writerQuestion.println(quest.getQuestionToServeur());
+                    }
+                    if(line.equals("CHA"))
+                    {
+                        quest =  Fsql.GetQuestionSelonImmeuble("D");
+                        writerQuestion.println(quest.getQuestionToServeur());
+                    }
+                }
+                line = readerQuestion.readLine();
             }
-            if(line.equals("MAN"))
-            {
-                quest =  Fsql.GetQuestionSelonImmeuble("M");
-                writerQuestion.println(quest.getQuestionToServeur());
-            }
-            if(line.equals("CHA"))
-            {
-                quest =  Fsql.GetQuestionSelonImmeuble("D");
-                writerQuestion.println(quest.getQuestionToServeur());
-            }
-
         }
         catch (UnknownHostException e)
         {
@@ -80,7 +89,7 @@ public class PDF implements  Runnable{
 
     }
 
-    public void CommandeHELLO()
+    public String CommandeHELLO()
     {
         String line;
 
@@ -89,6 +98,8 @@ public class PDF implements  Runnable{
             if (socketJeu.isClosed())
             {
                 socketJeu = new Socket(IP, PORT_JEU);
+                reader = new BufferedReader(new InputStreamReader(socketJeu.getInputStream()));
+                writer = new PrintWriter(new OutputStreamWriter(socketJeu.getOutputStream()), true);
             }
             writer.println("HELLO " + userName + " " + passWord);
             line = reader.readLine();
@@ -97,6 +108,7 @@ public class PDF implements  Runnable{
                 Fsql.Open();
                 Fsql.Init_BD();
                 connecter = true;
+                return line.substring(line.indexOf("O") + 2, line.length()).trim();
             }
             System.out.println(line);
         }
@@ -104,7 +116,7 @@ public class PDF implements  Runnable{
         {
             e.printStackTrace();
         }
-
+        return null;
     }
 
     public void CommandeGOTO(Main.Noeud node)
@@ -115,18 +127,27 @@ public class PDF implements  Runnable{
             writer.println("GOTO " + node.getNum());
             line = reader.readLine();
 
-                if(line.equals("D"))
-                {
-                    Fsql.IncrementerDoritos();
-                }
-                if(line.equals("M"))
-                {
-                    Fsql.IncrementMountainDew();
-                }
-                if(line.equals("P"))
-                {
-                    Fsql.AjouterCapital(1);
-                }
+            if(line.equals("OK"))
+            {
+                oldNode = node;
+                //todo
+                node.estJoueur = true;
+            }
+            if(line.equals("D"))
+            {
+                Fsql.IncrementerDoritos();
+                node.estJoueur = true;
+            }
+            if(line.equals("M"))
+            {
+                Fsql.IncrementMountainDew();
+                node.estJoueur = true;
+            }
+            if(line.equals("P"))
+            {
+                Fsql.AjouterCapital(1);
+                node.estJoueur = true;
+            }
 
             System.out.println(line);
         }
@@ -217,6 +238,7 @@ public class PDF implements  Runnable{
         {
             socketJeu.close();
             socketQuestion.close();
+            Fsql.Close();
 
         }
         catch (IOException e)
