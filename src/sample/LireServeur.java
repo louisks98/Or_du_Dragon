@@ -147,6 +147,7 @@ public class LireServeur {
         try
         {
             socketPosition.close();
+            System.out.println("Serveur position fermer");
             //socketJeu.close();
         }
         catch (IOException e)

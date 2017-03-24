@@ -1,7 +1,9 @@
 package sample;
 
+import javafx.application.Platform;
 import javafx.scene.control.ChoiceDialog;
 import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 
 import java.io.*;
 import java.net.Socket;
@@ -27,46 +29,50 @@ public class PDF implements  Runnable{
     private String userName = "LesRingos";
     private String passWord = "123QWEasdzxc";
     private BufferedReader reader;
+
     private PrintWriter writer;
+    private PrintWriter WriteReponse;
     private FonctionSQL Fsql = new FonctionSQL();
     private String[] questionSeparer;
     private int rep;
 
 
 
-    public class AfficherQuestion implements Runnable
-    {
-        @Override
-        public void run()
-        {
-            System.out.println("thread afficherquestion is running");
-            List<String> choix = new ArrayList<>();
-            choix.add(questionSeparer[2]);
-            choix.add(questionSeparer[3]);
-            choix.add(questionSeparer[4]);
-            choix.add(questionSeparer[5]);
-
-            ChoiceDialog<String> dialog = new ChoiceDialog<>(questionSeparer[2], choix);
-            dialog.setTitle("Question");
-            dialog.setHeaderText("Énigme posé par" + questionSeparer[0]);
-            dialog.setContentText(questionSeparer[1]);
-            Optional<String> result = dialog.showAndWait();
-            rep = -1;
-            if(result.isPresent())
-            {
-                rep = choix.indexOf(result.get());
-            }
-
-        }
-    }
+//    public class AfficherQuestion implements Runnable
+//    {
+//        @Override
+//        public void run()
+//        {
+//            System.out.println("thread afficherquestion is running");
+//            List<String> choix = new ArrayList<>();
+//            choix.add(questionSeparer[2]);
+//            choix.add(questionSeparer[3]);
+//            choix.add(questionSeparer[4]);
+//            choix.add(questionSeparer[5]);
+//
+//            ChoiceDialog<String> dialog = new ChoiceDialog<>(questionSeparer[2], choix);
+//            dialog.setTitle("Question");
+//            dialog.setHeaderText("Énigme posé par" + questionSeparer[0]);
+//            dialog.setContentText(questionSeparer[1]);
+//            Optional<String> result = dialog.showAndWait();
+//            rep = -1;
+//            if(result.isPresent())
+//            {
+//                rep = choix.indexOf(result.get());
+//            }
+//
+//        }
+//    }
 
     PDF()
     {
         try
         {
             socketJeu = new Socket(IP, PORT_JEU);
+
             reader = new BufferedReader(new InputStreamReader(socketJeu.getInputStream()));
             writer = new PrintWriter(new OutputStreamWriter(socketJeu.getOutputStream()), true);
+            WriteReponse = new PrintWriter(new OutputStreamWriter(socketJeu.getOutputStream()), true);
         }
         catch(IOException ioe)
         {
@@ -82,11 +88,12 @@ public class PDF implements  Runnable{
             System.out.println("thread pdf is running");
             String line;
             socketQuestion = new Socket(IP, PORT_ENIGME);
-           BufferedReader readerQuestion = new BufferedReader(new InputStreamReader(socketQuestion.getInputStream()));
-           PrintWriter writerQuestion = new PrintWriter(new OutputStreamWriter(socketQuestion.getOutputStream()), true);
+            BufferedReader readerQuestion = new BufferedReader(new InputStreamReader(socketQuestion.getInputStream()));
+            PrintWriter writerQuestion = new PrintWriter(new OutputStreamWriter(socketQuestion.getOutputStream()), true);
+
            Question quest;
-           AfficherQuestion dialog = new AfficherQuestion();
-           Thread tAfficher = new Thread(dialog);
+
+
 
             writerQuestion.println("HELLO " + userName + " " + passWord);
             line = readerQuestion.readLine();
@@ -111,13 +118,6 @@ public class PDF implements  Runnable{
                         quest =  Fsql.GetQuestionSelonImmeuble("D");
                         System.out.println(quest.getQuestionToServeur());
                         writerQuestion.println(quest.getQuestionToServeur());
-                    }
-                    if(line.contains(":"))
-                    {
-                        String question = line;
-                        System.out.println(line);
-                        questionSeparer = line.split(":");
-                        tAfficher.start();
                     }
                     System.out.println(line);
                 }
@@ -166,43 +166,90 @@ public class PDF implements  Runnable{
         return null;
     }
 
+    public class GOTO implements Runnable
+    {
+        Main.Noeud node;
+        public GOTO(Main.Noeud node)
+        {
+            this.node = node;
+        }
+
+        @Override
+        public void run()
+        {
+            String line;
+            try
+            {
+                writer.println("GOTO " + node.getNum());
+                line = reader.readLine();
+
+                if(line.equals("OK"))
+                {
+                    Main.numJoueur = node.getNum();
+                }
+                if(line.equals("D"))
+                {
+                    Fsql.IncrementerDoritos();
+                    Main.numJoueur = node.getNum();
+                }
+                if(line.equals("M"))
+                {
+                    Fsql.IncrementMountainDew();
+                    Main.numJoueur = node.getNum();
+                }
+                if(line.equals("P"))
+                {
+                    Fsql.AjouterCapital(1);
+                    Main.numJoueur = node.getNum();
+                }
+                if(line.equals("T"))
+                {
+                    if(Fsql.GetCapital() < 5 && Fsql.GetDoritos() < 1)
+                    {
+                        CloseServeur();
+                    }
+                    else
+                    {
+                        Fsql.AcheterSortieDePrisonTroll();
+                        Main.numJoueur = node.getNum();
+                    }
+                }
+                if(line.equals("G"))
+                {
+                    if(Fsql.GetCapital() < 5 && Fsql.GetMountainDew() < 1)
+                    {
+                        CloseServeur();
+                    }
+                    else
+                    {
+                        Fsql.AcheterSortieDePrisonGoblin();
+                        Main.numJoueur = node.getNum();
+                    }
+                }
+                if(line.contains("ENIG"))
+                {
+                    Main.numJoueur = node.getNum();
+                    String question = line;
+                    System.out.println(line);
+                    questionSeparer = line.split(":");
+                    Platform.runLater(() -> afficherQuestion());
+
+                }
+
+                System.out.println(line);
+            }
+            catch (IOException e)
+            {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void CommandeGOTO(Main.Noeud node)
     {
-        String line;
-        try
-        {
-            writer.println("GOTO " + node.getNum());
-            line = reader.readLine();
-
-            if(line.equals("OK"))
-            {
-                oldNode = node;
-                //todo
-                node.estJoueur = true;
-            }
-            if(line.equals("D"))
-            {
-                Fsql.IncrementerDoritos();
-                node.estJoueur = true;
-            }
-            if(line.equals("M"))
-            {
-                Fsql.IncrementMountainDew();
-                node.estJoueur = true;
-            }
-            if(line.equals("P"))
-            {
-                Fsql.AjouterCapital(1);
-                node.estJoueur = true;
-            }
-
-            System.out.println(line);
-        }
-        catch (IOException e)
-        {
-            e.printStackTrace();
-        }
-        //return line;
+        GOTO commande = new GOTO(node);
+        Thread t = new Thread(commande);
+        t.start();
     }
 
     public void CommandeBUILD()
@@ -254,6 +301,7 @@ public class PDF implements  Runnable{
 
     }
 
+
     public int getFond()
     {
         if (connecter)
@@ -285,6 +333,7 @@ public class PDF implements  Runnable{
         {
             socketJeu.close();
             socketQuestion.close();
+            System.out.println("serveur jeu et enigme fermer");
             Fsql.Close();
 
         }
@@ -293,6 +342,29 @@ public class PDF implements  Runnable{
             e.printStackTrace();
         }
 
+    }
+
+    public void afficherQuestion()
+    {
+        System.out.println("thread afficherquestion is running");
+        List<String> choix = new ArrayList<>();
+        choix.add(questionSeparer[2]);
+        choix.add(questionSeparer[3]);
+        choix.add(questionSeparer[4]);
+        choix.add(questionSeparer[5]);
+
+        ChoiceDialog<String> dialog = new ChoiceDialog<>(questionSeparer[2], choix);
+        dialog.setTitle("Question");
+        dialog.setHeaderText("Énigme posé par" + questionSeparer[0]);
+        dialog.setContentText(questionSeparer[1]);
+        Optional<String> result = dialog.showAndWait();
+        rep = -1;
+        if(result.isPresent())
+        {
+            rep = choix.indexOf(result.get());
+        }
+        System.out.println("Envoi de la reponse");
+        WriteReponse.println("CHOICE " + rep);
     }
 
 }

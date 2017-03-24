@@ -28,6 +28,7 @@ public class Main extends Application {
     final String manoir = "N";
     final String chateau = "C";
     final String piece = "P";
+    public static int numJoueur;
 
     public class Noeud extends Circle
     {
@@ -65,9 +66,10 @@ public class Main extends Application {
 
         public void ChangerCercle(String obj)
         {
+            tbCircle.get(numJoueur).setStroke(Color.BLUE);
             switch (obj)
             {
-                case joueur : if(!estJoueur) {this.setFill(Color.RED);} else {this.setFill(Color.BLUE);}
+                case joueur : this.setFill(Color.RED);
                 break;
                 case troll : this.setFill(Color.DARKGREEN);
                 break;
@@ -123,6 +125,7 @@ public class Main extends Application {
                 String line;
                 texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());
                 Protocole.CommandeGOTO(node);
+                //if(line.equals("T")||line.equals("G")) {serveur.CloseServeur();}
                 texteCapital.setText(Protocole.getFond() + " Pieces");
                 texteDoritos.setText(Protocole.getDoritos() + " Doritos");
                 textemountainDew.setText(Protocole.getMountainDew() + " MountainDew");
@@ -243,10 +246,12 @@ public class Main extends Application {
             if(serveur.GetConstruisible().get(i))
             {
                 tbCircle.get(i).setFill(Color.WHITE);
+                tbCircle.get(i).setStroke(Color.BLACK);
             }
             else
             {
                 tbCircle.get(i).setFill(Color.BLACK);
+                tbCircle.get(i).setStroke(Color.BLACK);
             }
         }
 
