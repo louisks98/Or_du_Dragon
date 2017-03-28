@@ -21,7 +21,6 @@ public class LireServeur {
     private ArrayList<String> Coordonnee = new ArrayList<>();
     private Vector<Boolean> Construisible = new Vector<>();
     private Vector<String> Liaison = new Vector<>();
-    //private Vector<String[]> Position = new Vector<>();
     private String Packet[];
     private Socket socketPosition;
 
@@ -48,7 +47,6 @@ public class LireServeur {
         try
         {
             socketPosition = new Socket(IP, PORT_POSITION);
-            //socketJeu = new Socket(IP, PORT_JEU);
         }
         catch (UnknownHostException e)
         {
@@ -67,7 +65,6 @@ public class LireServeur {
         {
             Socket soc_Carte = new Socket(IP, PORT_CARTE);
             BufferedReader reader = new BufferedReader(new InputStreamReader(soc_Carte.getInputStream()));
-            //BufferedWriter writer = new BufferedWriter(new FileWriter("Contenu_Serveur"));
             String line;
             String newline;
             int Compteur = 0;
@@ -119,10 +116,11 @@ public class LireServeur {
         try
         {
 
-            serveurReader = new BufferedReader(new InputStreamReader(socketPosition.getInputStream()));
-            serveurWriter = new PrintWriter(new OutputStreamWriter(socketPosition.getOutputStream()));
-            String ligne;
-
+            if(!socketPosition.isClosed())
+            {
+                serveurReader = new BufferedReader(new InputStreamReader(socketPosition.getInputStream()));
+                serveurWriter = new PrintWriter(new OutputStreamWriter(socketPosition.getOutputStream()));
+                String ligne;
 
                 ligne = serveurReader.readLine();
                 System.out.println(ligne);
@@ -135,6 +133,7 @@ public class LireServeur {
                     serveurWriter.println("");
                     serveurWriter.flush();
                 }
+            }
         }
         catch (java.io.IOException e)
         {
@@ -148,27 +147,10 @@ public class LireServeur {
         {
             socketPosition.close();
             System.out.println("Serveur position fermer");
-            //socketJeu.close();
         }
         catch (IOException e)
         {
             e.printStackTrace();
-        }
-    }
-
-
-
-    public static void VerifierParametre(String param, String j, String t, String g, String m, String d, String a, String n, String c) {
-        if (!param.equals(j) &&
-                !param.equals(t) &&
-                !param.equals(g) &&
-                !param.equals(m) &&
-                !param.equals(d) &&
-                !param.equals(a) &&
-                !param.equals(n) &&
-                !param.equals(c)) {
-            System.err.println("Un ou plusieurs parametres sont invalides.");
-            System.exit(1);
         }
     }
 }

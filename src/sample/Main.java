@@ -1,8 +1,6 @@
 package sample;
 import javafx.application.Application;
 import javafx.event.EventHandler;
-import javafx.event.EventType;
-import javafx.scene.PointLight;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
@@ -29,12 +27,11 @@ public class Main extends Application {
     final String chateau = "C";
     final String piece = "P";
     public static int numJoueur;
+    public Vector<Noeud> tbCircle = new Vector<>();
 
     public class Noeud extends Circle
     {
         private int num;
-        public boolean estJoueur = false;
-        private boolean construisible;
 
         Noeud(int x, int y, int grosseur ,boolean constructible, int num)
         {
@@ -44,12 +41,10 @@ public class Main extends Application {
             {
                 this.setFill(Color.WHITE);
                 this.setStroke(Color.BLACK);
-                this.construisible = true;
             }
             else
             {
                 this.setStroke(Color.BLACK);
-                this.construisible = false;
             }
             this.setStrokeWidth(3);
         }
@@ -59,10 +54,6 @@ public class Main extends Application {
             return num;
         }
 
-        public void ShowItem(Pane g)
-        {
-            //todo
-        }
 
         public void ChangerCercle(String obj)
         {
@@ -93,24 +84,14 @@ public class Main extends Application {
 
     public class Bouton extends Rectangle
     {
-        private int num;
-        public Bouton(int x1 ,int y1, int x2, int y2, int num)
+        public Bouton(int x1 ,int y1, int x2, int y2)
         {
             super(x1, y1, x2, y2);
-            this.num = num;
             this.setStroke(Color.BLACK);
             this.setFill(Color.WHITE);
             this.setStrokeWidth(2);
         }
-
-        public int getNum()
-        {
-            return num;
-        }
     }
-
-
-    public Vector<Noeud> tbCircle = new Vector<>();
 
     public void Cree_Noeud(Pane g, ArrayList<String> coord, Vector<Boolean> construsible)
     {
@@ -122,10 +103,8 @@ public class Main extends Application {
             y = getCoordonneeY(coord.get(i));
             Noeud node = new Noeud(x, y, 12, construsible.get(i), i);
             node.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-                String line;
                 texte.setText("X: " + node.getCenterX() + "   Y: " + node.getCenterY());
                 Protocole.CommandeGOTO(node);
-                //if(line.equals("T")||line.equals("G")) {serveur.CloseServeur();}
                 texteCapital.setText(Protocole.getFond() + " Pieces");
                 texteDoritos.setText(Protocole.getDoritos() + " Doritos");
                 textemountainDew.setText(Protocole.getMountainDew() + " MountainDew");
@@ -263,34 +242,28 @@ public class Main extends Application {
     Text texteDoritos = new Text(250, 60, "0 Doritos");
     Text textemountainDew = new Text(250, 80, "0 MountainDew");
     LireServeur serveur = new LireServeur();
-    //FonctionSQL Fsql = new FonctionSQL();
     @Override
     public void start(Stage primaryStage) throws Exception{
 
         ChangerCouleur couleur = new ChangerCouleur();
         Thread t = new Thread(couleur);
-        Thread tQuestion = new Thread(Protocole);
 
-        Bouton btnConnexion = new Bouton(10, 10, 100, 50, 1);
-        Bouton btnQuit = new Bouton(120, 10, 100, 50, 2);
-        Bouton btnBuild = new Bouton(10, 70, 100, 50, 3);
+        // initialisation des bouton
+        Bouton btnConnexion = new Bouton(10, 10, 100, 50);
+        Bouton btnQuit = new Bouton(120, 10, 100, 50);
+        Bouton btnBuild = new Bouton(10, 70, 100, 50);
 
+        // Ajout des mouse event sur les boutons
         btnConnexion.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
-            int num = Integer.parseInt(Protocole.CommandeHELLO());
-            tbCircle.get(num).setFill(Color.BLUE);
-            tQuestion.setDaemon(true);
-            tQuestion.start();
-            //tbCircle.get(num).estJoueur = true;
-            //Fsql.Open();
-            //Fsql.Init_BD();
+            Protocole.CommandeHELLO();
+            Protocole.CommandeHELLOQuest();
         });
         btnQuit.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {
             Protocole.CommandeQUIT();
-            //Fsql.Close();
         });
         btnBuild.addEventHandler(MouseEvent.MOUSE_CLICKED, e -> {Protocole.CommandeBUILD();});
 
-        Text texteBtn = new Text(20 , 40, "Connexion");
+        Text texteBtnConnexion = new Text(20 , 40, "Connexion");
         Text texteBtnQuit = new Text(140, 40, "Quitter");
         Text texteBtnBuild = new Text(20, 100,"Construire");
 
@@ -304,11 +277,11 @@ public class Main extends Application {
         texteDoritos.setFont(new Font(20));
         textemountainDew.setFont(new Font(20));
 
-        root.getChildren().add(texte);
+        //root.getChildren().add(texte);
         Image image = new Image("nowhereland.png");
         BackgroundImage bg = new BackgroundImage(image, BackgroundRepeat.REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, BackgroundSize.DEFAULT);
         root.setBackground(new Background(bg));
-        root.getChildren().addAll(btnConnexion, texteBtn, btnQuit, texteBtnQuit, btnBuild, texteBtnBuild, texteCapital, texteDoritos, textemountainDew);
+        root.getChildren().addAll(btnConnexion, texteBtnConnexion, btnQuit, texteBtnQuit, btnBuild, texteBtnBuild, texteCapital, texteDoritos, textemountainDew, texte);
         primaryStage.setTitle("L'Or du Dragon");
         primaryStage.setScene(new Scene(root, 1600, 900));
         primaryStage.show();
@@ -317,10 +290,12 @@ public class Main extends Application {
         primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
             @Override
             public void handle(WindowEvent event) {
-                //Protocole.CommandeQUIT();
-                serveur.CloseServeur();
-                Protocole.CloseServeur();
-                System.out.println("Serveur(s) déconnecté(s)");
+                if(Protocole.isConnecter())
+                {
+                    serveur.CloseServeur();
+                    Protocole.CloseServeur();
+                    System.out.println("Serveur(s) déconnecté(s)");
+                }
             }
         });
     }
