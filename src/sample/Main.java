@@ -32,6 +32,9 @@ public class Main extends Application {
     public class Noeud extends Circle
     {
         private int num;
+        private boolean estMan = false;
+        private boolean estAub = false;
+        private boolean estCha = false;
 
         Noeud(int x, int y, int grosseur ,boolean constructible, int num)
         {
@@ -54,6 +57,27 @@ public class Main extends Application {
             return num;
         }
 
+        private void setEstMan(boolean b) {estMan = b;}
+
+        private void setEstAub(boolean estAub) {
+            this.estAub = estAub;
+        }
+
+        private void setEstCha(boolean estCha) {
+            this.estCha = estCha;
+        }
+
+        public boolean isEstAub() {
+            return estAub;
+        }
+
+        public boolean isEstCha() {
+            return estCha;
+        }
+
+        public boolean isEstMan() {
+            return estMan;
+        }
 
         public void ChangerCercle(String obj)
         {
@@ -71,10 +95,19 @@ public class Main extends Application {
                 case doritos : this.setFill(Color.DARKORANGE);
                 break;
                 case auberge : this.setFill(Color.AQUA);
+                this.setEstAub(true);
+                this.setEstCha(false);
+                this.setEstMan(false);
                 break;
                 case manoir : this.setFill(Color.PURPLE);
+                    this.setEstAub(false);
+                    this.setEstCha(false);
+                    this.setEstMan(true);
                 break;
                 case chateau : this.setFill(Color.CRIMSON);
+                    this.setEstAub(false);
+                    this.setEstCha(true);
+                    this.setEstMan(false);
                 break;
                 case piece : this.setFill(Color.GOLD);
                 break;

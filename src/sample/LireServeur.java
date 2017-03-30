@@ -110,6 +110,9 @@ public class LireServeur {
 
     public void LirePosition()
     {
+
+
+
         BufferedReader serveurReader;
         PrintWriter serveurWriter;
 

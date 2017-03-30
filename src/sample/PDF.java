@@ -38,7 +38,6 @@ public class PDF {
         try
         {
             socketJeu = new Socket(IP, PORT_JEU);
-            socketQuestion = new Socket(IP, PORT_ENIGME);
             reader = new BufferedReader(new InputStreamReader(socketJeu.getInputStream()));
             writer = new PrintWriter(new OutputStreamWriter(socketJeu.getOutputStream()), true);
             WriteReponse = new PrintWriter(new OutputStreamWriter(socketJeu.getOutputStream()), true);
@@ -59,6 +58,7 @@ public class PDF {
             try
             {
                 System.out.println("thread pdf is running");
+                socketQuestion = new Socket(IP, PORT_ENIGME);
                 String line;
                 BufferedReader readerQuestion = new BufferedReader(new InputStreamReader(socketQuestion.getInputStream()));
                 PrintWriter writerQuestion = new PrintWriter(new OutputStreamWriter(socketQuestion.getOutputStream()), true);
@@ -70,10 +70,13 @@ public class PDF {
                 {
                     writerQuestion.println("HELLO " + userName + " " + passWord);
                     line = readerQuestion.readLine();
-                    while(!socketQuestion.isClosed())
+                    System.out.println("line read");
+                    while(true)
                     {
+                        //System.out.println(line);
                         if (line != null)
                         {
+                            System.out.println("in if != null");
                             if(line.equals("AUB"))
                             {
                                 quest =  Fsql.GetQuestionSelonImmeuble("F");
@@ -225,12 +228,19 @@ public class PDF {
                             Main.numJoueur = node.getNum();
                         }
                     }
+                    if(line.contains("mauvaise reponse"))
+                    {
+                        if(node.isEstAub()) {Fsql.AcheterDroitDePassageAuberge();}
+                        if (node.isEstCha()) {Fsql.AcheterDroitDePassageChateau();}
+                        if (node.isEstMan()) {Fsql.AcheterDroitDePassageManoir();}
+                    }
+
                     if(line.contains("ENIG"))
                     {
                         Main.numJoueur = node.getNum();
-                        String question = line;
+                        String question = line.substring(4, line.length());
                         System.out.println(line);
-                        questionSeparer = line.split(":");
+                        questionSeparer = question.split(":");
                         Platform.runLater(() -> afficherQuestion());
                     }
                     System.out.println(line);
@@ -405,6 +415,7 @@ public class PDF {
             rep = choix.indexOf(result.get());
         }
         System.out.println("Envoi de la reponse");
+        System.out.println(rep);
         WriteReponse.println("CHOICE " + rep);
     }
 
